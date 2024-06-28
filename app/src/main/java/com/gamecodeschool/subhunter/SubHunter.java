@@ -33,8 +33,8 @@ public class SubHunter extends Activity {
     int gridHeight;
     float horizontalTouched = -100;
     float verticalTouched = -100;
-    int subHorizontalPos;
-    int subVerticalPos;
+    int subHorizontalPosition;
+    int subVerticalPosition;
     boolean hit = false;
     int shotsTaken;
     int distanceFromSub;
@@ -50,6 +50,7 @@ public class SubHunter extends Activity {
         Point size = new Point();//point object has x and y variables to store width and height of display
         display.getSize(size);//point obj gets sent in as an argument
         //init size based variables based on screed resolution:
+        //Note: Variables declared are only accessible within the method; therefore important to init var outside
         numberHorizontalPixels = size.x;
         numberVerticalPixels = size.y;
         blockSize = numberHorizontalPixels/gridWidth;
@@ -63,9 +64,19 @@ public class SubHunter extends Activity {
         after the player wins a game
          */
         public void newGame(){
+            Random random = new Random();
+            subHorizontalPosition = random.nextInt(gridWidth);
+            subVerticalPosition = random.nextInt(gridHeight);
+
+            shotsTaken = 0;
             Log.d("Debugging","In newGame");
         }
-        /*
+
+
+
+
+
+    /*
         Here is the drawing code of grid, hud touch indicator
          */
         void draw(){//void methods do no return any specific value
@@ -104,8 +115,8 @@ public class SubHunter extends Activity {
             Log.d("gridHeight",""+gridHeight);
             Log.d("horizontalTouched",""+horizontalTouched);
             Log.d("verticalTouched",""+verticalTouched);
-            Log.d("subHorizontalPos",""+subHorizontalPos);
-            Log.d("subVerticalPos",""+subVerticalPos);
+            Log.d("subHorizontalPosition",""+subHorizontalPosition);
+            Log.d("subVerticalPosition",""+subVerticalPosition);
             Log.d("hit",""+hit);
             Log.d("shotsTaken",""+shotsTaken);
             Log.d("debugging",""+debugging);
