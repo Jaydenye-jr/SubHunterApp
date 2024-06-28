@@ -1,5 +1,6 @@
 package com.gamecodeschool.subhunter;
 
+import android.media.Image;
 import android.os.Bundle;
 
 import androidx.activity.EdgeToEdge;
@@ -39,22 +40,49 @@ public class SubHunter extends Activity {
     int shotsTaken;
     int distanceFromSub;
     boolean debugging = true;
+
+    //Objects of classes needed to do drawing:
+    ImageView gameView;
+    Bitmap blankBitmap;
+    Canvas canvas;
+    Paint paint;
+
+
     //Activity is what interacts with the operating system
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);//No title bar or action bar
-        //setContentView(R.layout.activity_main); this line removed as not using normal user interface
+        //setContentView(R.layout.activity_main); this line removed as not using normal user
+        // interface
         //get resolution of display:
-        Display display = getWindowManager().getDefaultDisplay();//obj display is initialised with the get...() methods
-        Point size = new Point();//point object has x and y variables to store width and height of display
+        Display display = getWindowManager().getDefaultDisplay();//obj display is initialised with
+        // the get...() methods
+        Point size = new Point();//point object has x and y variables to store width and height of
+        // display
         display.getSize(size);//point obj gets sent in as an argument
         //init size based variables based on screed resolution:
-        //Note: Variables declared are only accessible within the method; therefore important to init var outside
+        //Note: Variables declared are only accessible within the method; therefore important to
+        // init var outside
         numberHorizontalPixels = size.x;
         numberVerticalPixels = size.y;
         blockSize = numberHorizontalPixels/gridWidth;
         gridHeight = numberVerticalPixels/blockSize;
+
+        blankBitmap = Bitmap.createBitmap(numberHorizontalPixels,numberVerticalPixels
+                ,Bitmap.Config.ARGB_8888);
+        canvas = new Canvas(blankBitmap);
+        gameView = new ImageView(this);
+        paint = new Paint();
+        // Do drawing here
+        // Associate the drawn upon Bitmap with the ImageView
+
+        // Tell Android to set our drawing
+        // as the view for this app
+        // via the gameView
+
+        setContentView(gameView);
+
         Log.d("Debugging","In onCreate");
         newGame();
         draw();
@@ -80,6 +108,19 @@ public class SubHunter extends Activity {
         Here is the drawing code of grid, hud touch indicator
          */
         void draw(){//void methods do no return any specific value
+            gameView.setImageBitmap(blankBitmap);
+            //wipe screen with white color:
+            canvas.drawColor(Color.argb(255,255,255,255));
+            // Change the paint color to black
+            paint.setColor(Color.argb(255, 0, 0, 0));
+            // Draw the vertical lines of the grid
+            canvas.drawLine(blockSize * 1, 0, blockSize *1, numberVerticalPixels -1, paint);
+            // Draw the horizontal lines of the grid
+            canvas.drawLine(0, blockSize * 1, numberHorizontalPixels -1, blockSize * 1, paint);
+            //Resize text for score and distance
+            paint.setTextSize(blockSize*2);
+            paint.setColor(Color.argb(255,0,0,255));
+            canvas.drawText("Shots Taken: "+shotsTaken+ "  Distance: " + distanceFromSub, blockSize, blockSize*1.75f, paint);
             Log.d("Debugging","In draw");
             printDebuggingText();
         }
@@ -108,20 +149,21 @@ public class SubHunter extends Activity {
         }
         //this code prints debug text
         void printDebuggingText(){
-            Log.d("numberHorizontalPixels",""+numberHorizontalPixels);
-            Log.d("numberVerticalPixels",""+numberVerticalPixels);
-            Log.d("blockSize",""+blockSize);
-            Log.d("gridWidth",""+gridWidth);
-            Log.d("gridHeight",""+gridHeight);
-            Log.d("horizontalTouched",""+horizontalTouched);
-            Log.d("verticalTouched",""+verticalTouched);
-            Log.d("subHorizontalPosition",""+subHorizontalPosition);
-            Log.d("subVerticalPosition",""+subVerticalPosition);
-            Log.d("hit",""+hit);
-            Log.d("shotsTaken",""+shotsTaken);
-            Log.d("debugging",""+debugging);
-            Log.d("distanceFromSub",""+distanceFromSub);
-
+            paint.setTextSize(blockSize);
+            canvas.drawText("numberHorizontalPixels = " + numberHorizontalPixels, 50, blockSize * 3, paint);
+            canvas.drawText("numberVerticalPixels = " + numberVerticalPixels, 50, blockSize * 4, paint);
+            canvas.drawText("blockSize = " + blockSize, 50, blockSize * 5, paint);
+            canvas.drawText("gridWidth = " + gridWidth, 50, blockSize * 6, paint);
+            canvas.drawText("gridHeight = " + gridHeight, 50, blockSize * 7, paint);
+            canvas.drawText("horizontalTouched ="+ horizontalTouched, 50, blockSize * 8, paint);
+            canvas.drawText("verticalTouched = " +verticalTouched, 50, blockSize * 9, paint);
+            canvas.drawText("subHorizontalPosition = " + subHorizontalPosition, 50, blockSize * 10, paint);
+            canvas.drawText("subVerticalPosition = " + subVerticalPosition, 50, blockSize * 11, paint);
+            canvas.drawText("hit = " + hit, 50, blockSize * 12, paint);
+            canvas.drawText("shotsTaken = " + shotsTaken, 50, blockSize * 13, paint);
+            canvas.drawText("debugging = " + debugging, 50, blockSize * 14, paint);
 
         }
+
+
     }
