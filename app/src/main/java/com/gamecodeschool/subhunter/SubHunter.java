@@ -113,16 +113,21 @@ public class SubHunter extends Activity {
             canvas.drawColor(Color.argb(255,255,255,255));
             // Change the paint color to black
             paint.setColor(Color.argb(255, 0, 0, 0));
-            // Draw the vertical lines of the grid
-            canvas.drawLine(blockSize * 1, 0, blockSize *1, numberVerticalPixels -1, paint);
-            // Draw the horizontal lines of the grid
-            canvas.drawLine(0, blockSize * 1, numberHorizontalPixels -1, blockSize * 1, paint);
-            //Resize text for score and distance
-            paint.setTextSize(blockSize*2);
-            paint.setColor(Color.argb(255,0,0,255));
-            canvas.drawText("Shots Taken: "+shotsTaken+ "  Distance: " + distanceFromSub, blockSize, blockSize*1.75f, paint);
-            Log.d("Debugging","In draw");
-            printDebuggingText();
+
+            for (int i = 0; i<gridWidth; i++) {
+                // Draw the vertical lines of the grid
+                canvas.drawLine(blockSize * i, 0, blockSize * i, numberVerticalPixels, paint);
+                // Draw the horizontal lines of the grid
+            }
+            for (int i = 0; i<gridHeight; i++) {
+                canvas.drawLine(0, blockSize * i, numberHorizontalPixels , blockSize * i, paint);
+                //Resize text for score and distance
+                paint.setTextSize(blockSize * 2);
+                paint.setColor(Color.argb(255, 0, 0, 255));
+                canvas.drawText("Shots Taken: " + shotsTaken + "  Distance: " + distanceFromSub, blockSize, blockSize * 1.75f, paint);
+                Log.d("Debugging", "In draw");
+                printDebuggingText();
+            }
         }
         /*
         This part handles tapping of screen
@@ -132,16 +137,34 @@ public class SubHunter extends Activity {
         // with super.<mtd>()
         public boolean onTouchEvent(MotionEvent motionEvent){
             Log.d("Debugging","In onTouchEvent");
-            takeShot();
+            if((motionEvent.getAction() & MotionEvent.ACTION_MASK) == MotionEvent.ACTION_UP){
+                //Process player shot by passing coordinates of finger to takeShot
+                takeShot(motionEvent.getX(), motionEvent.getY());
+
+            }
             return true;
         }
         /*
         This part executes when player taps the screen, calculate distance from sub and decide
         hit/miss
          */
-        void takeShot(){
+        void takeShot(float touchX, float touchY){
             Log.d("Debugging","In takeShot");
-            draw();
+            shotsTaken ++;//add to shots taken
+            horizontalTouched = (int)touchX/blockSize;//convert float screen coord into grid
+            verticalTouched = (int)touchY/blockSize;
+            //check if shot hit sub
+            hit = horizontalTouched == subHorizontalPosition && verticalTouched == subVerticalPosition;
+            //distancte from sub to original target
+            int horizontalGap = (int)horizontalTouched-subHorizontalPosition;
+            int verticalGap = (int)verticalTouched-subVerticalPosition;
+            distanceFromSub = (int)Math.sqrt((horizontalGap*horizontalGap)+(verticalGap*verticalGap)
+            );
+
+            if(hit)
+                boom();
+            else
+                draw();
         }
         //this code says Boom
         void boom(){
