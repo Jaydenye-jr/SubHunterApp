@@ -39,7 +39,7 @@ public class SubHunter extends Activity {
     boolean hit = false;
     int shotsTaken;
     int distanceFromSub;
-    boolean debugging = true;
+    boolean debugging = false;
 
     //Objects of classes needed to do drawing:
     ImageView gameView;
@@ -120,15 +120,21 @@ public class SubHunter extends Activity {
                 // Draw the horizontal lines of the grid
             }
             for (int i = 0; i<gridHeight; i++) {
-                canvas.drawLine(0, blockSize * i, numberHorizontalPixels , blockSize * i, paint);
+                canvas.drawLine(0, blockSize * i, numberHorizontalPixels, blockSize * i, paint);
+            }
+                // Draw the player's shot
+                canvas.drawRect(horizontalTouched * blockSize, verticalTouched * blockSize,
+                    (horizontalTouched * blockSize) + blockSize, (verticalTouched * blockSize)+ blockSize, paint);
                 //Resize text for score and distance
                 paint.setTextSize(blockSize * 2);
                 paint.setColor(Color.argb(255, 0, 0, 255));
-                canvas.drawText("Shots Taken: " + shotsTaken + "  Distance: " + distanceFromSub, blockSize, blockSize * 1.75f, paint);
+                canvas.drawText("Shots Taken: " + shotsTaken + "  Distance: " + distanceFromSub,
+                        blockSize, blockSize * 1.75f, paint);
                 Log.d("Debugging", "In draw");
-                printDebuggingText();
+                if (debugging)
+                    printDebuggingText();
             }
-        }
+
         /*
         This part handles tapping of screen
          */
@@ -137,6 +143,7 @@ public class SubHunter extends Activity {
         // with super.<mtd>()
         public boolean onTouchEvent(MotionEvent motionEvent){
             Log.d("Debugging","In onTouchEvent");
+            //check if its removed finger from screen
             if((motionEvent.getAction() & MotionEvent.ACTION_MASK) == MotionEvent.ACTION_UP){
                 //Process player shot by passing coordinates of finger to takeShot
                 takeShot(motionEvent.getX(), motionEvent.getY());
@@ -161,15 +168,31 @@ public class SubHunter extends Activity {
             distanceFromSub = (int)Math.sqrt((horizontalGap*horizontalGap)+(verticalGap*verticalGap)
             );
 
-            if(hit)
+            if(hit){
+                //if multiple statements, rember to put curly brackets
+                Random random = new Random();
+                subHorizontalPosition = random.nextInt(gridWidth);
+                subVerticalPosition = random.nextInt(gridHeight);
+                shotsTaken = 0;
                 boom();
+            }
             else
                 draw();
         }
         //this code says Boom
-        void boom(){
-
+        void boom() {
+            gameView.setImageBitmap(blankBitmap);
+            // Wipe the screen with a red color
+            canvas.drawColor(Color.argb(255, 255, 0, 0));
+            // Draw some huge white text
+            paint.setColor(Color.argb(255, 255, 255, 255));
+            paint.setTextSize(blockSize * 10);
+            canvas.drawText("BOOM!", blockSize * 4, blockSize * 14, paint); // Draw some text to prompt restarting
+            paint.setTextSize(blockSize * 2);
+            canvas.drawText("Tap to start again", blockSize * 10, blockSize * 18, paint);
         }
+
+    // Start a new game newGame();
         //this code prints debug text
         void printDebuggingText(){
             paint.setTextSize(blockSize);
